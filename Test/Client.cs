@@ -13,10 +13,14 @@ public class Client : MonoBehaviour
     private string serverIP = "127.0.0.1"; // 服务器IP地址
     private int serverPort = 8888; // 服务器端口号
 
-    private Vector3 newPos = Vector3.zero;
+    private PlayerData myData = new PlayerData();
+    PlayerData playerData;
+    public string playerName;
 
     private void Start()
     {
+        myData.playerName = playerName;
+
         ConnectToServer();
     }
 
@@ -47,27 +51,18 @@ public class Client : MonoBehaviour
                 int bytesRead = stream.Read(buffer, 0, buffer.Length);
                 string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
                 // 处理接收到的消息
-
-
-                // transform.position += JsonUtility.FromJson<Vector3>(message) * Time.deltaTime;
-                newPos = JsonUtility.FromJson<Vector3>(message);
-                // transform.position += newPos * Time.deltaTime;
-                Debug.Log(newPos);
-
-                // Debug.Log("收到服务器消息：" + message);
-                
+                playerData = JsonUtility.FromJson<PlayerData>(message);
                 // 在这里处理接收到的消息并进行同步操作
                 // 例如，更新游戏中的玩家位置、状态等等
                 
             }
             catch(ObjectDisposedException e){
-                Debug.Log("断开连接");
+                Debug.Log("断开连接：" + e.Message);
                 break;
             }
             catch (Exception e)
             {
                 Debug.Log("接收消息错误：" + e.Message);
-                // break;
             }
         }
     }
@@ -81,13 +76,34 @@ public class Client : MonoBehaviour
 
     private void Update()
     {
-        // 监听左右移动输入
-        float moveHorizontal = Input.GetAxis("Horizontal");
-        // SendMessage_(moveHorizontal.ToString());
-        if(moveHorizontal != 0) {
-            SendMessage_(JsonUtility.ToJson(new Vector3(moveHorizontal, 0, 0)).ToString());
-            transform.position += newPos * Time.deltaTime;
-            newPos = Vector3.zero;
+        // 当有用户数据过来时，进行处理
+        if(playerData != null) {
+            AllObjController.Instance.Controller(playerData);
+            playerData = null;
+        }
+
+        if(Input.GetKeyDown(KeyCode.A)) {
+            SendMessage_(JsonUtility.ToJson(myData).ToString());
+        }
+
+        
+        // 测试
+        if(myData.playerName == "PlayerA") {
+            // 监听左右移动输入
+            float moveHorizontal = Input.GetAxis("Horizontal");
+            if(moveHorizontal != 0) {
+                myData.position = transform.position + new Vector3(moveHorizontal, 0, 0) * Time.deltaTime;
+                // 发送新数据
+                SendMessage_(JsonUtility.ToJson(myData).ToString());
+            }
+        } else if(myData.playerName == "PlayerB") {
+            // 监听左右移动输入
+            float vertical = Input.GetAxis("Vertical");
+            if(vertical != 0) {
+                myData.position = transform.position + new Vector3(0, vertical, 0) * Time.deltaTime;
+                // 发送新数据
+                SendMessage_(JsonUtility.ToJson(myData).ToString());
+            }
         }
 
     }
@@ -100,11 +116,4 @@ public class Client : MonoBehaviour
             client.Close();
     }
 
-    IEnumerator MyCoroutine(Vector3 newPos)
-    {
-        // 在协程中调用 get_transform
-        transform.position = newPos;
-        
-        yield return null;
-    }
 }
