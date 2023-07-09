@@ -52,9 +52,6 @@ public class Client : MonoBehaviour
                 string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
                 // 处理接收到的消息
                 playerData = JsonUtility.FromJson<PlayerData>(message);
-                // 在这里处理接收到的消息并进行同步操作
-                // 例如，更新游戏中的玩家位置、状态等等
-                
             }
             catch(ObjectDisposedException e){
                 Debug.Log("断开连接：" + e.Message);
@@ -82,11 +79,6 @@ public class Client : MonoBehaviour
             playerData = null;
         }
 
-        if(Input.GetKeyDown(KeyCode.A)) {
-            SendMessage_(JsonUtility.ToJson(myData).ToString());
-        }
-
-        
         // 测试
         if(myData.playerName == "PlayerA") {
             // 监听左右移动输入
