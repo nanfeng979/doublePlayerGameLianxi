@@ -1,51 +1,59 @@
 import socket
 import threading
 
-# 服务器配置
-SERVER_IP = '127.0.0.1'  # 服务器IP地址
-SERVER_PORT = 8888  # 服务器端口号
+server_ip = "127.0.0.1"  # 服务器IP地址
+server_port = 8888  # 服务器端口号
+clients = []  # 存储已连接的客户端
 
-# 客户端处理线程
+# 数据
+PlayerData = {
+    'position': {
+        'x': 1.23,
+        'y': 2.34,
+        'z': 3.45
+    }
+}
+
+
 def handle_client(client_socket, client_address):
-    print(f'与客户端 {client_address} 建立连接')
-
     while True:
         try:
-            # 接收客户端消息
-            data = client_socket.recv(1024)
+            data = client_socket.recv(1024).decode("utf-8")
             if not data:
                 break
-            message = data.decode('utf-8')
-            # 处理客户端消息
-            print(f'接收到客户端 {client_address} 的消息: {message}')
+            # 处理接收到的客户端消息
+            print("收到来自{}的消息：{}".format(client_address, data))
+            
+            # 向所有客户端广播消息
+            broadcast_message(data)
+            
         except Exception as e:
-            print(f'与客户端 {client_address} 的连接异常: {str(e)}')
+            print("接收消息错误：", e)
             break
 
-    # 关闭客户端连接
+    print("与{}的连接已关闭".format(client_address))
+    clients.remove(client_socket)
     client_socket.close()
-    print(f'与客户端 {client_address} 的连接已关闭')
+
+def broadcast_message(message):
+    for client in clients:
+        try:
+            client.sendall(message.encode("utf-8"))
+        except Exception as e:
+            print("发送消息错误：", e)
 
 def start_server():
-    # 创建服务器套接字
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind((SERVER_IP, SERVER_PORT))
+    server_socket.bind((server_ip, server_port))
     server_socket.listen(5)
-    print('服务器已启动')
+    print("服务器已启动，监听 {}:{}".format(server_ip, server_port))
 
     while True:
-        try:
-            # 等待客户端连接
-            client_socket, client_address = server_socket.accept()
-            # 创建客户端处理线程
-            client_thread = threading.Thread(target=handle_client, args=(client_socket, client_address))
-            client_thread.start()
-        except KeyboardInterrupt:
-            print('服务器已停止')
-            break
+        client_socket, client_address = server_socket.accept()
+        print("与{}建立连接".format(client_address))
+        clients.append(client_socket)
+        
+        client_thread = threading.Thread(target=handle_client, args=(client_socket, client_address))
+        client_thread.start()
 
-    # 关闭服务器套接字
-    server_socket.close()
-
-# 启动服务器
 start_server()

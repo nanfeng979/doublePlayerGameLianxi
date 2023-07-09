@@ -20,27 +20,28 @@ public class test : MonoBehaviour
 
     private void Start()
     {
-        json_player.position = transform.position;
-        SetPosition(ref json_player);
-        transform.position = GetPosition(ref json_player);
+        // json_player.position = transform.position;
+        // SetPosition(ref json_player);
+        // transform.position = GetPosition(ref json_player);
     }
 
     void Update()
     {
+        Debug.Log($"{{position: {JsonUtility.ToJson(transform.position).ToString()}}}");
         // transform.position = GetPosition(ref json_player);
 
-        if (Input.GetAxisRaw("Horizontal") != 0)
-        {
-            json_player.position += new Vector3(Input.GetAxisRaw("Horizontal"), 0, 0);
-        }
-        else if (Input.GetAxisRaw("Vertical") != 0)
-        {
-            json_player.position += new Vector3(0, Input.GetAxisRaw("Vertical"), 0);
-        }
+        // if (Input.GetAxisRaw("Horizontal") != 0)
+        // {
+        //     json_player.position += new Vector3(Input.GetAxisRaw("Horizontal"), 0, 0);
+        // }
+        // else if (Input.GetAxisRaw("Vertical") != 0)
+        // {
+        //     json_player.position += new Vector3(0, Input.GetAxisRaw("Vertical"), 0);
+        // }
 
-        SetPosition(ref json_player);
-        transform.position = GetPosition(ref json_player);
-        // Debug.Log(json_player.position.x + ", " + json_player.position.y + ", " + json_player.position.z);
+        // SetPosition(ref json_player);
+        // transform.position = GetPosition(ref json_player);
+        // // Debug.Log(json_player.position.x + ", " + json_player.position.y + ", " + json_player.position.z);
     }
 
     private void SetPosition(ref Json_Player json_player)

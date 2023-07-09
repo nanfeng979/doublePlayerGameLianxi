@@ -1,10 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using System;
+using System.Collections;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using UnityEngine;
 
 public class Client : MonoBehaviour
 {
@@ -13,6 +12,8 @@ public class Client : MonoBehaviour
     private byte[] buffer = new byte[1024];
     private string serverIP = "127.0.0.1"; // 服务器IP地址
     private int serverPort = 8888; // 服务器端口号
+
+    private Vector3 newPos = Vector3.zero;
 
     private void Start()
     {
@@ -46,12 +47,27 @@ public class Client : MonoBehaviour
                 int bytesRead = stream.Read(buffer, 0, buffer.Length);
                 string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
                 // 处理接收到的消息
-                Debug.Log("收到服务器消息：" + message);
+
+
+                // transform.position += JsonUtility.FromJson<Vector3>(message) * Time.deltaTime;
+                newPos = JsonUtility.FromJson<Vector3>(message);
+                // transform.position += newPos * Time.deltaTime;
+                Debug.Log(newPos);
+
+                // Debug.Log("收到服务器消息：" + message);
+                
+                // 在这里处理接收到的消息并进行同步操作
+                // 例如，更新游戏中的玩家位置、状态等等
+                
+            }
+            catch(ObjectDisposedException e){
+                Debug.Log("断开连接");
+                break;
             }
             catch (Exception e)
             {
                 Debug.Log("接收消息错误：" + e.Message);
-                break;
+                // break;
             }
         }
     }
@@ -67,7 +83,13 @@ public class Client : MonoBehaviour
     {
         // 监听左右移动输入
         float moveHorizontal = Input.GetAxis("Horizontal");
-        SendMessage_(moveHorizontal.ToString());
+        // SendMessage_(moveHorizontal.ToString());
+        if(moveHorizontal != 0) {
+            SendMessage_(JsonUtility.ToJson(new Vector3(moveHorizontal, 0, 0)).ToString());
+            transform.position += newPos * Time.deltaTime;
+            newPos = Vector3.zero;
+        }
+
     }
 
     private void OnDestroy()
@@ -76,5 +98,13 @@ public class Client : MonoBehaviour
             stream.Close();
         if (client != null)
             client.Close();
+    }
+
+    IEnumerator MyCoroutine(Vector3 newPos)
+    {
+        // 在协程中调用 get_transform
+        transform.position = newPos;
+        
+        yield return null;
     }
 }
