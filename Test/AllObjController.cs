@@ -20,7 +20,11 @@ public class AllObjController : MonoBehaviour
 
     // 移动
     private void Move(string playerName, Vector3 positionOffset) {
-        GameObject.Find(playerName).transform.position = positionOffset;
+        var obj = GameObject.Find(playerName);
+        if(obj != null) {
+            obj.transform.position = positionOffset;
+        }
+            
     }
 
 }
