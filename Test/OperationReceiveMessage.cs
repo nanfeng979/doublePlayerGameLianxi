@@ -12,6 +12,7 @@ public class OperationReceiveMessage : MonoBehaviour
     public List<string> objList = new List<string>();
 
     public PlayerData playerData = new PlayerData();
+    private GameObject selfObj;
 
     void Awake()
     {
@@ -23,7 +24,7 @@ public class OperationReceiveMessage : MonoBehaviour
     void Update() {
         // 监控数据是否变化
         if(playerData != null) {
-            // 有数据时对该数据进行处理，然后销毁数据
+            // 更新数据，然后销毁数据
             Controller(playerData);
             playerData = null;
         }
@@ -43,24 +44,20 @@ public class OperationReceiveMessage : MonoBehaviour
 
     // 实例化对象，仅执行一次
     private void CreateObj(string playerName) {
-        GameObject obj = null;
-        
         if(playerName == "PlayerA") {
-            obj = Instantiate(prefabA, new Vector3(-1, 0, 0), Quaternion.identity);
-            obj.GetComponent<SpriteRenderer>().color = new Color(1, 1, 0, 1);
+            selfObj = Instantiate(prefabA, new Vector3(-1, 0, 0), Quaternion.identity);
+            selfObj.GetComponent<SpriteRenderer>().color = new Color(1, 1, 0, 1);
         } else if(playerName == "PlayerB") {
-            obj = Instantiate(prefabB, new Vector3(1, 0, 0), Quaternion.identity);
-            obj.GetComponent<SpriteRenderer>().color = new Color(1, 0, 1, 1);
+            selfObj = Instantiate(prefabB, new Vector3(1, 0, 0), Quaternion.identity);
+            selfObj.GetComponent<SpriteRenderer>().color = new Color(1, 0, 1, 1);
         }
-        obj.name = playerName;
+        selfObj.name = playerName;
 
         if(PlayerSet.Instance.playerName == playerName) {
             
         } else {
-            obj.GetComponent<PlayerController>().enabled = false;
+            selfObj.GetComponent<PlayerController>().enabled = false;
         }
-
-        sendCreateInitData(ref obj);
     }
 
     // 实例化对象后发送初始化数据
@@ -68,7 +65,10 @@ public class OperationReceiveMessage : MonoBehaviour
         PlayerData tempData = new PlayerData();
         tempData.playerName = obj.name;
         tempData.position = obj.transform.position;
-        tempData.spriteColor = obj.GetComponent<SpriteRenderer>().color;
+        if(obj.GetComponent<SpriteRenderer>()) {
+            tempData.spriteColor = obj.GetComponent<SpriteRenderer>().color;
+        }
+        
         OperationSendMessage.Instance.SendMessage_(JsonUtility.ToJson(tempData).ToString());
     }
 

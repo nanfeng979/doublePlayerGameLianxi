@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerData {
+    public string type;
     public string playerName;
     public Vector3 position;
     public Color spriteColor;
 }
-
