@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
 public class OperationReceiveMessage : MonoBehaviour
 {
     public static OperationReceiveMessage Instance;
@@ -26,7 +26,7 @@ public class OperationReceiveMessage : MonoBehaviour
             // 有数据时对该数据进行处理，然后销毁数据
             Controller(playerData);
             playerData = null;
-        }    
+        }
     }
 
     // 对用户的数据进行解析和控制
@@ -34,6 +34,7 @@ public class OperationReceiveMessage : MonoBehaviour
         // 实例化对象，每个对象仅执行以此
         if(!objList.Contains(playerData.playerName)) {
             CreateObj(playerData.playerName);
+            // ChangeSkin(playerData.playerName, playerData.spriteColor);
             objList.Add(playerData.playerName);
             return;
         }
@@ -42,31 +43,32 @@ public class OperationReceiveMessage : MonoBehaviour
         Move(playerData.playerName, playerData.position);
     }
 
-    // 创建对象
+    // 实例化对象，仅执行一次
     private void CreateObj(string playerName) {
-        GameObject obj = new GameObject();
+        GameObject obj = null;
         
         if(playerName == "PlayerA") {
             obj = Instantiate(prefabA, new Vector3(0, 0, 0), Quaternion.identity);
             obj.transform.position = new Vector3(-1, 0, 0);
-            if(PlayerSet.Instance.playerName != "PlayerA") {
-                obj.GetComponent<PlayerAController>().enabled = false;
-            }
+            obj.GetComponent<SpriteRenderer>().color = new Color(1, 1, 0, 1);
         } else if(playerName == "PlayerB") {
             obj = Instantiate(prefabB, new Vector3(0, 0, 0), Quaternion.identity);
             obj.transform.position = new Vector3(1, 0, 0);
-            if(PlayerSet.Instance.playerName != "PlayerB") {
-                obj.GetComponent<PlayerBController>().enabled = false;
-            }
+            obj.GetComponent<SpriteRenderer>().color = new Color(1, 0, 1, 1);
+        }
+
+        if(PlayerSet.Instance.playerName == playerName) {
+            
+        } else {
+            obj.GetComponent<PlayerAController>().enabled = false;
         }
 
         obj.name = playerName;
-        obj.GetComponent<SpriteRenderer>().color = UnityEngine.Random.ColorHSV();
-        
+
         sendCreateInitData(ref obj);
     }
 
-    // 创建对象后发送初始化数据
+    // 实例化对象后发送初始化数据
     private void sendCreateInitData(ref GameObject obj) {
         PlayerData tempData = new PlayerData();
         tempData.playerName = obj.name;
