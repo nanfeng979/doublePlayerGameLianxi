@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AllObjController : MonoBehaviour
+public class OperationReceiveMessage : MonoBehaviour
 {
-    public static AllObjController Instance;
+    public static OperationReceiveMessage Instance;
 
     void Start()
     {
@@ -24,7 +24,6 @@ public class AllObjController : MonoBehaviour
         if(obj != null) {
             obj.transform.position = positionOffset;
         }
-            
     }
-
+    
 }

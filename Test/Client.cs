@@ -75,7 +75,7 @@ public class Client : MonoBehaviour
     {
         // 当有用户数据过来时，进行处理
         if(playerData != null) {
-            AllObjController.Instance.Controller(playerData);
+            OperationReceiveMessage.Instance.Controller(playerData);
             playerData = null;
         }
 
