@@ -5,23 +5,26 @@ using System.Text;
 using System.Threading;
 using UnityEngine;
 
-public class Client : MonoBehaviour
+public class OperationSendMessage : MonoBehaviour
 {
+    public static OperationSendMessage Instance;
     private TcpClient client;
     private NetworkStream stream;
     private byte[] buffer = new byte[1024];
     private string serverIP = "127.0.0.1"; // 服务器IP地址
     private int serverPort = 8888; // 服务器端口号
 
-    private PlayerData myData = new PlayerData();
-    PlayerData playerData;
-    public string playerName;
-
-    private void Start()
+    void Start()
     {
-        myData.playerName = playerName;
+        if(Instance == null) {
+            Instance = this;
+        }
 
         ConnectToServer();
+
+        PlayerData playerData = new PlayerData();
+        playerData.playerName = PlayerSet.Instance.playerName;
+        OperationReceiveMessage.Instance.playerData = playerData;
     }
 
     private void ConnectToServer()
@@ -51,7 +54,7 @@ public class Client : MonoBehaviour
                 int bytesRead = stream.Read(buffer, 0, buffer.Length);
                 string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
                 // 处理接收到的消息
-                playerData = JsonUtility.FromJson<PlayerData>(message);
+                OperationReceiveMessage.Instance.playerData = JsonUtility.FromJson<PlayerData>(message);
             }
             catch(ObjectDisposedException e){
                 Debug.Log("断开连接：" + e.Message);
@@ -64,40 +67,11 @@ public class Client : MonoBehaviour
         }
     }
 
-    private void SendMessage_(string message)
+    public void SendMessage_(string message)
     {
         byte[] data = Encoding.UTF8.GetBytes(message);
         stream.Write(data, 0, data.Length);
         stream.Flush();
-    }
-
-    private void Update()
-    {
-        // 当有用户数据过来时，进行处理
-        if(playerData != null) {
-            OperationReceiveMessage.Instance.Controller(playerData);
-            playerData = null;
-        }
-
-        // 测试
-        if(myData.playerName == "PlayerA") {
-            // 监听左右移动输入
-            float moveHorizontal = Input.GetAxis("Horizontal");
-            if(moveHorizontal != 0) {
-                myData.position = transform.position + new Vector3(moveHorizontal, 0, 0) * Time.deltaTime;
-                // 发送新数据
-                SendMessage_(JsonUtility.ToJson(myData).ToString());
-            }
-        } else if(myData.playerName == "PlayerB") {
-            // 监听左右移动输入
-            float vertical = Input.GetAxis("Vertical");
-            if(vertical != 0) {
-                myData.position = transform.position + new Vector3(0, vertical, 0) * Time.deltaTime;
-                // 发送新数据
-                SendMessage_(JsonUtility.ToJson(myData).ToString());
-            }
-        }
-
     }
 
     private void OnDestroy()
@@ -107,5 +81,4 @@ public class Client : MonoBehaviour
         if (client != null)
             client.Close();
     }
-
 }

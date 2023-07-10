@@ -5,36 +5,26 @@ using UnityEngine.SceneManagement;
 
 public class PlayerSet : MonoBehaviour
 {
-    public char Player;
+    public string playerName;
     public static PlayerSet Instance;
-    // Start is called before the first frame update
     void Start()
     {
         Instance = this;
 
-        if(this != null) {
-            return;
-        }
-        DontDestroyOnLoad(gameObject);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        // DontDestroyOnLoad(gameObject);
     }
 
     public void SetPlayerA() {
-        Player = 'A';
+        playerName = "PlayerA";
         nextScene();
     }
 
     public void SetPlayerB() {
-        Player = 'B';
+        playerName = "PlayerB";
         nextScene();
     }
 
     public void nextScene() {
-        SceneManager.LoadScene("Play");
+        SceneManager.LoadScene("test");
     }
 }

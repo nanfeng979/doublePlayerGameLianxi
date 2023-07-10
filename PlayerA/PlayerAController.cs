@@ -4,21 +4,22 @@ using UnityEngine;
 
 public class PlayerAController : MonoBehaviour
 {
-    // Start is called before the first frame update
+    private PlayerData myData = new PlayerData();
     void Start()
     {
-        
+        myData.playerName = gameObject.name;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if(PlayerSet.Instance.Player == 'A') {
-            if(Input.GetKeyDown(KeyCode.A)) {
-                transform.position += new Vector3(-1, 0, 0);
-            } else if(Input.GetKeyDown(KeyCode.D)) {
-                transform.position += new Vector3(1, 0, 0);
-            }
+        if(gameObject.name != "PlayerA") {
+            return;
+        }
+        float moveHorizontal = Input.GetAxis("Horizontal");
+        if(moveHorizontal != 0) {
+            myData.position = transform.position + new Vector3(moveHorizontal, 0, 0) * Time.deltaTime;
+            // 发送新数据
+            OperationSendMessage.Instance.SendMessage_(JsonUtility.ToJson(myData).ToString());
         }
     }
 }

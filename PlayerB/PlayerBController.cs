@@ -4,21 +4,24 @@ using UnityEngine;
 
 public class PlayerBController : MonoBehaviour
 {
-    // Start is called before the first frame update
+    private PlayerData myData = new PlayerData();
     void Start()
     {
-        
+        myData.playerName = gameObject.name;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if(PlayerSet.Instance.Player == 'B') {
-            if(Input.GetKeyDown(KeyCode.LeftArrow)) {
-                transform.position += new Vector3(-1, 0, 0);
-            } else if(Input.GetKeyDown(KeyCode.RightArrow)) {
-                transform.position += new Vector3(1, 0, 0);
-            }
+        if(gameObject.name != "PlayerB") {
+            return;
+        }
+
+        // 监听左右移动输入
+        float vertical = Input.GetAxis("Vertical");
+        if(vertical != 0) {
+            myData.position = transform.position + new Vector3(0, vertical, 0) * Time.deltaTime;
+            // 发送新数据
+            OperationSendMessage.Instance.SendMessage_(JsonUtility.ToJson(myData).ToString());
         }
     }
 }
