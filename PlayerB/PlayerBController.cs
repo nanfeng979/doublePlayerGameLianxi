@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerBController : MonoBehaviour
+public class PlayerBController : PlayerController
 {
     private PlayerData myData = new PlayerData();
     void Start()
@@ -15,10 +15,6 @@ public class PlayerBController : MonoBehaviour
 
     void Update()
     {
-        if(gameObject.name != "PlayerB") {
-            return;
-        }
-
         // 监听上下移动输入
         float vertical = Input.GetAxis("Vertical");
         if(vertical != 0) {

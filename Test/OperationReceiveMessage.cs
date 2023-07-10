@@ -34,12 +34,10 @@ public class OperationReceiveMessage : MonoBehaviour
         // 实例化对象，每个对象仅执行以此
         if(!objList.Contains(playerData.playerName)) {
             CreateObj(playerData.playerName);
-            // ChangeSkin(playerData.playerName, playerData.spriteColor);
             objList.Add(playerData.playerName);
             return;
         }
 
-        ChangeSkin(playerData.playerName, playerData.spriteColor);
         Move(playerData.playerName, playerData.position);
     }
 
@@ -48,22 +46,19 @@ public class OperationReceiveMessage : MonoBehaviour
         GameObject obj = null;
         
         if(playerName == "PlayerA") {
-            obj = Instantiate(prefabA, new Vector3(0, 0, 0), Quaternion.identity);
-            obj.transform.position = new Vector3(-1, 0, 0);
+            obj = Instantiate(prefabA, new Vector3(-1, 0, 0), Quaternion.identity);
             obj.GetComponent<SpriteRenderer>().color = new Color(1, 1, 0, 1);
         } else if(playerName == "PlayerB") {
-            obj = Instantiate(prefabB, new Vector3(0, 0, 0), Quaternion.identity);
-            obj.transform.position = new Vector3(1, 0, 0);
+            obj = Instantiate(prefabB, new Vector3(1, 0, 0), Quaternion.identity);
             obj.GetComponent<SpriteRenderer>().color = new Color(1, 0, 1, 1);
         }
+        obj.name = playerName;
 
         if(PlayerSet.Instance.playerName == playerName) {
             
         } else {
-            obj.GetComponent<PlayerAController>().enabled = false;
+            obj.GetComponent<PlayerController>().enabled = false;
         }
-
-        obj.name = playerName;
 
         sendCreateInitData(ref obj);
     }
