@@ -5,5 +5,6 @@ using UnityEngine;
 public class PlayerData {
     public string playerName;
     public Vector3 position;
+    public Color spriteColor;
 }
 

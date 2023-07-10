@@ -8,6 +8,9 @@ public class PlayerAController : MonoBehaviour
     void Start()
     {
         myData.playerName = gameObject.name;
+        myData.position = transform.position;
+        myData.spriteColor = GetComponent<SpriteRenderer>().color;
+        OperationSendMessage.Instance.SendMessage_(JsonUtility.ToJson(myData).ToString());
     }
 
     void Update()
